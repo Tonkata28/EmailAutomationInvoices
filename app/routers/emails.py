@@ -1,7 +1,7 @@
 from fastapi import APIRouter, UploadFile
-from adapters.ai_model import model
-from config import PROJECT_ROOT
-from data.senders import senders
+from ..adapters.ai_model import model
+from ..config import PROJECT_ROOT
+from ..data.senders import senders
 
 router = APIRouter()
 

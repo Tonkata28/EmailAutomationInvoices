@@ -7,7 +7,7 @@ from pydantic import BaseModel
 from typing import Literal
 from datetime import datetime
 
-from config import GEMINI_API_KEY
+from ..config import GEMINI_API_KEY
 
 type InvoiceProvider = Literal["VIVACOM", "ViK"]
 
