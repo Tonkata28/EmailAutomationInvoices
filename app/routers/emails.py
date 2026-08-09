@@ -43,24 +43,29 @@ def scrape_email_info(
 
 @router.post("/invoice/email")
 def categorize_email(
-    email_info: EmailInfo
+    content
 ):
+    print(content)
     # assume until here that the email is from vik/vivacom
 
     # filter if email is regarding an invoice based on keywords
-    if any([k not in email_info.text for k in senders[email_info.sender_email]["keywords"]]) or email_info.invoice_file is None:
-        return {
-            "code": 400, # or whatever is good for this,
-            "message": "Email is not an invoice"
-        }
+    # if any([k not in email_info.text for k in senders[email_info.sender_email]["keywords"]]) or email_info.invoice_file is None:
+    #     return {
+    #         "code": 400, # or whatever is good for this,
+    #         "message": "Email is not an invoice"
+    #     }
 
     
 
-    invoice = model.extract(email_info.text, PROJECT_ROOT / "files" / "18331605835_20260722_0119735899.pdf")
+    # invoice = model.extract(email_info.text, PROJECT_ROOT / "files" / "18331605835_20260722_0119735899.pdf")
 
     # save email and invoice to some storage
 
     # send invoice to accountant
-    pass
+    
+    return {
+        "code": 400,
+        "message": "Succesfully received notification"
+    }
 
 
