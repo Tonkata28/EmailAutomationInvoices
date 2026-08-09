@@ -1,6 +1,5 @@
 from fastapi import FastAPI, Request
-
-from routers import emails
+from .routers import emails
 
 
 app = FastAPI()
