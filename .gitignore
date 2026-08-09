@@ -216,3 +216,14 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+files/
+**/__pycache__
+**.vscode
+token.json
+quickstart.py
+demo.py
+invoice.pdf
+todo.md
+credentials.json
+email-automation-pvkey.json
