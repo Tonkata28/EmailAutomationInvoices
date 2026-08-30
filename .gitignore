@@ -221,9 +221,8 @@ files/
 **/__pycache__
 **.vscode
 token.json
-quickstart.py
-demo.py
+scripts/
 invoice.pdf
 todo.md
-credentials.json
+gcp-credentials.json
 email-automation-pvkey.json

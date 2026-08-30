@@ -1,14 +1,38 @@
-from dotenv import load_dotenv
-import os
-
 from pathlib import Path
 
-load_dotenv(".env")
+from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import BaseModel, EmailStr, Field
 
-platforms_gmail = os.getenv("gmail")
-passwordEVN = os.getenv("passwordEVN")
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
-if passwordEVN is None or platforms_gmail is None or GEMINI_API_KEY is None:
-    raise Exception("Credentials not set! Program terminated!")
+ENV_PATH = Path(__file__).resolve().parent / ".env"
+
+
+class DatabaseSettings(BaseModel):
+    host: str
+    user: str
+    password: str
+    db: str
+    port: int
+
+
+class Settings(BaseSettings):
+    model_config = SettingsConfigDict(
+        env_file=ENV_PATH,
+        env_file_encoding="utf-8",
+        env_nested_delimiter="__",
+        extra="ignore",
+    )
+
+    debug: bool = False
+    gmail: EmailStr
+    pass_evn: str
+    gemini_api_key: str
+    port: int
+    ngrok_authtoken: str
+    firm_name: str
+    accountant_email: EmailStr
+    database: DatabaseSettings
+
+settings = Settings() # pyright: ignore[reportCallIssue] -> since it warns about a wrong thing here
+
+

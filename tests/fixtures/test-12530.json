@@ -1,0 +1,29 @@
+{
+  "history": [
+    {
+      "id": "12451",
+      "messages": [
+        {
+          "id": "19ff1c96ceb9f553",
+          "threadId": "19ff1c96ceb9f553"
+        }
+      ],
+      "messagesAdded": [
+        {
+          "message": {
+            "id": "19ff1c96ceb9f553",
+            "threadId": "19ff1c96ceb9f553",
+            "labelIds": [
+              "UNREAD",
+              "Label_6607987361884991565",
+              "Label_2314963774244779182",
+              "CATEGORY_PERSONAL",
+              "INBOX"
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "historyId": "12530"
+}

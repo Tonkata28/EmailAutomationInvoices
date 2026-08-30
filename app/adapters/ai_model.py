@@ -1,21 +1,18 @@
 from abc import ABC, abstractmethod
-import base64
-from pathlib import Path
 from fastapi import UploadFile
 from google import genai
 from pydantic import BaseModel
-from typing import Literal
-from datetime import datetime
+from google.genai import types
 
-from ..config import GEMINI_API_KEY
+from app.config import settings
 
-type InvoiceProvider = Literal["VIVACOM", "ViK"]
-
-class InvoiceMetaData(BaseModel):
+class ExtractionInfo(BaseModel):
     is_invoice: bool
-    provider: InvoiceProvider|None = None
-    id: str
-    date_of_issue: datetime
+    keywords: list[str] | None
+
+
+class RegardsInvoiceInfo(BaseModel):
+    is_invoice: bool
 
 
 class BaseGenerativeModel(ABC):
@@ -31,7 +28,7 @@ class BaseGenerativeModel(ABC):
         self.__api_key = value
 
     @abstractmethod
-    def extract(self, file: UploadFile) -> InvoiceMetaData:
+    def extract_keywords(self, file: UploadFile) -> ExtractionInfo:
         pass
 
 
@@ -40,30 +37,58 @@ class GeminiGenerativeModel(BaseGenerativeModel):
     def __init__(self, api_key: str):
         self.client = genai.Client(api_key=api_key)
 
-    def extract(self, email_body: str, file_path: Path) -> InvoiceMetaData:
-        # gets the document and determines if it is an invoice and extracts the fields in InvoiceMetaData
+    def extract_keywords(self, email_body: str, recall=0) -> ExtractionInfo|None:
 
-        uploaded_file = self.client.files.upload(file=file_path)
+        if recall == 2:
+            return None
+
+        # gets the document and determines if it is an invoice and extracts the fields in InvoiceKeywords
+
+        # uploaded_file = self.client.files.upload(file=file_path)
         response = self.client.models.generate_content(
-            model="gemini-3.6-flash",
+            model="gemini-2.5-flash",
             contents=[
-                f"Extract the wanted properties in the format specified: {email_body}",
-                uploaded_file
+                "Your task for now is to determine if this email body text regards an invoice." + 
+                "If it is an invoice, weigh the probability of this to be a boilerplate email and provide keywords with which you would check this to be absolutely sure it's regarding an invoice." + 
+                "If you do not think this is possible to be checked with keywords, leave the keywords as null: ",
+                email_body
             ],
-            config={
-                'response_mime_type': 'application/json',
-                'response_schema': InvoiceMetaData,
-            }
+            config=types.GenerateContentConfig(
+                response_mime_type="application/json",
+                response_schema=ExtractionInfo,
+                thinking_config=types.ThinkingConfig(thinking_budget=5000),
+            )
         )
 
-        print(response.text)
-        assert response.text is not None
-        return InvoiceMetaData.model_validate_json(response.text)
+        if response.text is None:
+            print("None returned as response from gemini")
+            return self.extract_keywords(email_body, recall=recall + 1)
+
+        return ExtractionInfo.model_validate_json(response.text)
+
+    def determine_email(self, email_body: str) -> RegardsInvoiceInfo:
+
+        response = self.client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=[
+                "Determine if this email body text regards an invoice.",
+                email_body
+            ],
+            config=types.GenerateContentConfig(
+                response_mime_type='application/json',
+                response_schema=RegardsInvoiceInfo,
+                thinking_config=types.ThinkingConfig(thinking_budget=5000),
+            )
+        )
+
+        if response.text is None:
+            print("None returned as response from gemini")
+            return RegardsInvoiceInfo(is_invoice=False)
+
+        return RegardsInvoiceInfo.model_validate_json(response.text)
 
 
 class CustomGenerativeModel(BaseGenerativeModel):
     pass
 
-
-assert GEMINI_API_KEY is not None
-model = GeminiGenerativeModel(api_key=GEMINI_API_KEY)
+model = GeminiGenerativeModel(api_key=settings.gemini_api_key)
