@@ -1,5 +1,7 @@
 # Email Invoice Automation
 
+[Privacy Policy](https://tonkata28.github.io/EmailAutomationInvoices/privacy-policy) · [Terms of Service](https://tonkata28.github.io/EmailAutomationInvoices/tos)
+
 Route invoice emails to your accountant—automatically.
 
 Email Invoice Automation connects to your inbox, detects invoice-related emails and attachments, and forwards them to the accountant email address you choose. It can also label or file processed messages so your inbox stays organized.
